@@ -1,12 +1,21 @@
-const { model, Schema } = require("mongoose");
+const { Schema, model } = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const userSchema = new Schema(
   {
-    username: {
+    username: String,
+    email: {
       type: String,
       required: true,
-      trim: true,
       unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    admin: {
+      type: Boolean,
+      default: false,
     },
   },
   {
@@ -14,4 +23,13 @@ const userSchema = new Schema(
   }
 );
 
-module.exports = model("user", userSchema);
+userSchema.methods.encryptPassword = async (password) => {
+  const salt = await bcrypt.genSalt(10);
+  return await bcrypt.hash(password, salt);
+};
+
+userSchema.methods.validatePassword = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
+
+module.exports = model("User", userSchema);
