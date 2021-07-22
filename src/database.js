@@ -1,18 +1,22 @@
 const mongoose = require("mongoose");
 
-const URI = process.env.MONGODB_URI
-  ? process.env.MONGODB_URI
-  : "mongodb://localhost/DB-test";
+(async () => {
+  try {
+    const options = {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true,
+      useFindAndModify: false,
+    };
 
-mongoose.connect(URI, {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useUnifiedTopology: true,
-  useFindAndModify: false,
-});
-
-const connection = mongoose.connection;
-
-connection.once("open", () => {
-  console.log("Database is connected");
-});
+    const db = await mongoose.connect(process.env.MONGODB_URI, options);
+    console.log(
+      "Connected to DB: (",
+      db.connection.name,
+      ") at:",
+      db.connection.host
+    );
+  } catch (error) {
+    console.error(error);
+  }
+})();
